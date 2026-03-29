@@ -1,0 +1,25 @@
+# 临时验证脚本目录（见 .cursor/rules/code-hygiene-and-reuse.mdc）
+scratch/
+
+# Android / Gradle
+**/.gradle/
+**/build/
+**/local.properties
+**/captures/
+**/.cxx/
+**/.externalNativeBuild/
+*.iml
+
+# IDE（可由 Android Studio 重新生成）
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+**/.venv/
+**/venv/
+backend/.env
+
+# 密钥与签名
+*.jks
+*.keystore

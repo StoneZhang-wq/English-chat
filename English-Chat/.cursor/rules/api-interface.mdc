@@ -1,0 +1,81 @@
+---
+description: English-Chat API 基础信息、主要接口列表与接口约定，新增或修改接口时请遵守
+alwaysApply: true
+---
+
+# English-Chat API 接口规则
+
+## 基础信息
+
+- **API 基址**：`http://localhost:8000`（开发）；生产环境以实际部署为准
+- **认证**：Bearer Token。前端请求头携带 `Authorization: Bearer <token>`，token 从 sessionStorage 读取；登录 `POST /api/account/login` 返回后由前端写入 sessionStorage
+- **统一响应**：使用 `utils.response` 的 `success_response` 等；常见格式 `{ "status": "success", "message": "...", ... }`
+- **路由定义位置**：routers/auth.py（account）、routers/admin.py（admin）、routers/ai_chat.py（chat）、routers/api.py（/api 根）、routers/scene.py（scene-npc）、routers/audio.py（audio）
+
+## 主要 API 前缀与端点列表
+
+### /api/account（routers/auth.py）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/account/register | 注册 |
+| POST | /api/account/login | 登录 |
+| POST | /api/account/logout | 登出 |
+| GET | /api/account/current | 获取当前用户 |
+
+### /api/admin（routers/admin.py，仅 username=admin）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/admin/users/stats | 用户统计 |
+| GET | /api/admin/users | 用户列表（分页） |
+| PUT | /api/admin/users/{user_id} | 更新用户 |
+| DELETE | /api/admin/users/{user_id} | 删除用户 |
+
+### /api/chat（routers/ai_chat.py）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | /api/chat/practice | 自然对话练习 |
+| POST | /api/chat/summary | 学习卡片摘要 |
+
+### /api（routers/api.py，练习/学习/语音等）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/characters | 角色列表 |
+| POST | /api/voice/upload | 上传语音并处理 |
+| POST | /api/learning/recommend | 学习推荐 |
+| POST | /api/english/generate | 生成英文对话卡片 |
+| POST | /api/practice/start | 开始练习 |
+| POST | /api/practice/respond | 用户回复验证 |
+| POST | /api/practice/end | 结束练习 |
+| POST | /api/practice/generate-review | 生成复习笔记 |
+| POST | /api/practice/save-memory | 保存练习记忆 |
+| POST | /api/practice/mark-unit-mastered | 标记单元已掌握 |
+| GET | /api/scenes/{scene_id} | 获取场景 |
+
+### /api/scene-npc（routers/scene.py）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/scene-npc/big-scenes | 大场景列表 |
+| GET | /api/scene-npc/small-scenes | 小场景列表（query: big_scene_id） |
+| GET | /api/scene-npc/immersive-small-scenes | 沉浸式小场景列表 |
+| GET | /api/scene-npc/npcs | NPC 列表（query: small_scene_id） |
+| GET | /api/scene-npc/dialogue/learn | 获取学习对话 |
+| GET | /api/scene-npc/dialogue/review | 获取复习对话 |
+| GET | /api/scene-npc/dialogue/immersive | 获取沉浸式对话（创建 ChatSession 并返回 session_id） |
+| POST | /api/scene-npc/immersive-chat | 沉浸式自由对话 |
+| POST | /api/scene-npc/immersive-chat/report | 生成沉浸式对话报告 |
+
+### /api/audio（routers/audio.py）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | /api/audio/tts/{file_path:path} | 用户 TTS 文件服务 |
+| GET | /api/audio/english_dialogue/{dialogue_id}/{file_path:path} | 固定剧本 TTS 文件 |
+| GET | /api/audio/temp/{token} | 临时音频 |
+
+## 新增或修改接口时的约定
+
+- 需要登录的接口使用 `Depends(get_current_user)`；仅管理员使用 `Depends(get_current_admin)`。
+- 返回格式与现有接口一致，使用 `utils.response` 的统一响应方法。
+- 业务逻辑写在 **service** 或 **crud**，router 只做参数解析、依赖注入与返回。
+- 涉及场景/对话数据时，必须通过 **service.scene_manager** 的接口获取，不得在 router 中直接查 Dialogue/BigScene/SmallScene 表。
+
+详细请求/响应参数与示例见：`doc/English-Chat-AI-接口手册.md`。

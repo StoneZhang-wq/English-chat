@@ -1,0 +1,46 @@
+# Web Framework
+fastapi>=0.109.0
+jinja2>=3.0
+uvicorn[standard]>=0.27.0
+starlette>=0.35.0
+python-multipart>=0.0.6
+
+# Database
+sqlalchemy[asyncio]>=2.0.25
+aiomysql>=0.2.0
+asyncmy>=0.2.11
+
+# Cache
+redis>=5.0.0
+
+
+# Authentication & Security
+passlib[bcrypt]>=1.7.4
+python-jose[cryptography]>=3.3.0
+bcrypt>=4.1.2
+argon2-cffi>=23.1.0
+
+# HTTP & WebSocket
+httpx>=0.26.0
+aiohttp>=3.9.0
+websockets>=12.0
+
+# AI & LLM
+openai>=2.21.0
+google-genai>=0.3.0
+
+# Local ASR (optional; set ASR_PROVIDER=local)
+faster-whisper>=1.0.0
+
+# Config & Validation
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# File & Text
+aiofiles>=23.2.1
+textblob>=0.17.0
+pydub>=0.25.1
+
+# Logging
+loguru>=0.7.2

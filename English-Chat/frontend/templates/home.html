@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Chat — Pick a Scenario</title>
+    <script>
+        (function () {
+            try {
+                document.documentElement.className = sessionStorage.getItem('token') ? 'home-preauth-ok' : 'home-preauth-no';
+            } catch (e) {
+                document.documentElement.className = 'home-preauth-no';
+            }
+        })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/frontend/static/css/voice_chat.css">
+    <style>
+        /* 主页：覆盖 voice_chat.css 的全局 body，避免无法滚动 */
+        body.page-home {
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 100vh;
+            background-color: #fafaf9 !important;
+        }
+        html.home-preauth-no #home-shell {
+            display: none !important;
+        }
+        html.home-preauth-ok #home-shell {
+            display: flex !important;
+        }
+        html.home-preauth-ok #login-overlay {
+            display: none !important;
+        }
+        html.home-preauth-no #login-overlay {
+            display: flex !important;
+        }
+        .mode-card.mode-rail.active {
+            background-color: #1c1917;
+            color: #fafaf9;
+            border-color: #1c1917;
+        }
+        .mode-card.mode-rail.active svg {
+            stroke: #fafaf9;
+        }
+    </style>
+</head>
+<body class="page-home bg-stone-50 text-stone-900 min-h-screen antialiased">
+
+    <!-- 与语音页一致的登录/注册层（未登录时由 html 类控制显示） -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🎯 欢迎使用英语学习助手</h1>
+                <p id="login-header-desc">使用用户名和密码登录</p>
+            </div>
+            <div class="login-form" id="login-form">
+                <form id="login-form-submit" method="dialog" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="username-input">用户名</label>
+                        <input type="text" id="username-input" class="username-input" placeholder="请输入用户名" maxlength="20" autocomplete="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="password-input">密码</label>
+                        <input type="password" id="password-input" class="username-input" placeholder="请输入密码" autocomplete="current-password">
+                    </div>
+                    <button type="submit" id="login-btn" class="login-btn">
+                        <span>登录</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+                <p class="login-switch-text">没有账号？<a href="javascript:void(0)" id="go-register-link">去注册</a></p>
+            </div>
+            <div class="login-form hidden" id="register-form">
+                <form id="register-form-submit" method="dialog" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="register-username">用户名 <span class="required-mark">*</span></label>
+                        <input type="text" id="register-username" class="username-input" placeholder="请输入用户名（字母、数字、中文等）" maxlength="20" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-password">密码 <span class="required-mark">*</span></label>
+                        <input type="password" id="register-password" class="username-input" placeholder="至少8个字符" autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-password-confirm">确认密码 <span class="required-mark">*</span></label>
+                        <input type="password" id="register-password-confirm" class="username-input" placeholder="再次输入密码" autocomplete="new-password">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-name">姓名 <span class="required-mark">*</span></label>
+                        <input type="text" id="register-name" class="username-input" placeholder="请输入姓名" maxlength="32" autocomplete="name">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-english-level">英语水平 <span class="required-mark">*</span></label>
+                        <select id="register-english-level" class="username-input" autocomplete="off">
+                            <option value="">请选择</option>
+                            <option value="入门">入门</option>
+                            <option value="初级">初级</option>
+                            <option value="中级">中级</option>
+                            <option value="高级">高级</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="register-age">年龄 <span class="required-mark">*</span></label>
+                        <input type="number" id="register-age" class="username-input" placeholder="请输入年龄" min="1" max="150" value="" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-occupation">职业 <span class="required-mark">*</span></label>
+                        <input type="text" id="register-occupation" class="username-input" placeholder="如：学生、教师、程序员" maxlength="64" autocomplete="organization-title">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-interests">兴趣爱好 <span class="required-mark">*</span></label>
+                        <input type="text" id="register-interests" class="username-input" placeholder="如：阅读、旅行、音乐" maxlength="255" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-goals">目标（选填）</label>
+                        <input type="text" id="register-goals" class="username-input" placeholder="如：通过四级、日常交流" maxlength="128" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-habits">习惯（选填）</label>
+                        <input type="text" id="register-habits" class="username-input" placeholder="如：每天背单词30分钟" maxlength="128" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-preferences">偏好（选填）</label>
+                        <input type="text" id="register-preferences" class="username-input" placeholder="如：喜欢情景对话、偏好美音" maxlength="255" autocomplete="off">
+                    </div>
+                    <button type="submit" id="register-btn" class="login-btn">
+                        <span>注册</span>
+                    </button>
+                </form>
+                <p class="login-switch-text">已有账号？<a href="javascript:void(0)" id="go-login-link">去登录</a></p>
+            </div>
+            <div class="login-hint">
+                <p>💡 每个账号都有独立的记忆和学习记录</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="home-shell" class="min-h-screen flex flex-col md:flex-row">
+        <aside class="md:fixed md:left-6 md:top-1/2 md:-translate-y-1/2 z-30 flex md:flex-col flex-row items-center justify-center gap-2 md:gap-3 py-4 md:py-5 px-4 md:px-3 md:mx-0 border-b md:border-b-0 border-stone-200 md:border-0 bg-stone-50 md:bg-transparent shrink-0">
+            <nav class="flex md:flex-col flex-row items-center gap-2 md:gap-3 bg-white border border-stone-200 rounded-full p-2 md:p-3 shadow-sm" aria-label="练习模式">
+                <button type="button" class="mode-card mode-rail active flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-full border border-stone-200 bg-white text-stone-700 hover:border-stone-900 transition-all duration-300" data-mode="practice" title="练习模式（剧本）" aria-label="练习模式">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/></svg>
+                </button>
+                <button type="button" class="mode-card mode-rail flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-full border border-stone-200 bg-white text-stone-700 hover:border-stone-900 transition-all duration-300" data-mode="ai_chat" title="AI 对话（沉浸式场景）" aria-label="AI 对话">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                </button>
+                <button type="button" class="mode-card mode-rail flex items-center justify-center w-11 h-11 md:w-12 md:h-12 rounded-full border border-stone-200 bg-white text-stone-700 hover:border-stone-900 transition-all duration-300" data-mode="real_match" title="真人匹配" aria-label="真人匹配">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </button>
+            </nav>
+        </aside>
+
+        <p class="fixed bottom-5 left-4 md:left-6 text-sm font-serif italic text-stone-400 z-20 pointer-events-none select-none">EchoEnglish</p>
+
+        <main class="flex-1 flex flex-col items-center pt-8 md:pt-20 pb-16 px-5 md:pl-28 md:pr-10 w-full min-w-0">
+            <header class="text-center w-full max-w-3xl mb-8 md:mb-10">
+                <h1 class="text-4xl md:text-5xl font-serif italic text-stone-900 mb-4">Pick a Scenario</h1>
+                <p class="text-[10px] uppercase tracking-widest font-bold text-stone-400 mb-10 md:mb-12">Recommended For You Today</p>
+
+                <div class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white border border-stone-200 rounded-full pl-6 sm:pl-8 pr-2 py-2 shadow-sm">
+                    <input type="text" id="preference-input" class="flex-1 min-w-0 bg-transparent border-0 py-3 text-sm text-stone-900 placeholder:text-stone-400 focus:ring-0 focus:outline-none" placeholder="想练什么场景？（例如：看牙医、酒店入住、自我介绍…）" autocomplete="off" />
+                    <button type="button" id="btn-request" class="shrink-0 flex items-center justify-center gap-2 rounded-full bg-stone-900 text-stone-50 px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-90" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                        Request
+                    </button>
+                </div>
+            </header>
+
+            <section class="hidden w-full max-w-5xl mt-2 md:mt-6" id="scenes-section" aria-live="polite">
+                <h2 class="sr-only" id="scenes-title">推荐场景</h2>
+                <div class="scene-list grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6" id="scene-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/frontend/static/js/core.js"></script>
+    <script src="/frontend/static/js/home.js"></script>
+</body>
+</html>

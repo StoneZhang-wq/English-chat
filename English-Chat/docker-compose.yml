@@ -1,0 +1,73 @@
+# English-Chat 一键部署：应用 + MySQL + Redis
+# 使用方式：在项目根目录执行  docker-compose up -d
+# 首次启动后需在 MySQL 中建库（若未自动创建），并配置 .env 或下方 environment 中的 DB_* / REDIS 等
+
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: english-chat-app
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8000
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=chat
+      - DB_USER=chat_user
+      - DB_PASSWORD=chat134!
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      # 以下请按需设置或使用 .env
+      # - OPENAI_API_KEY=
+      # - OPENAI_BASE_URL=
+      # - VOLCENGINE_ACCESS_TOKEN=
+      # - DATA_PATH=/app/data
+      # - LOG_PATH=/app/logs/chat.log
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./resource:/app/resource
+      - ./frontend:/app/frontend
+      - ./characters:/app/characters
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: english-chat-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-rootpass}"
+      MYSQL_DATABASE: "${DB_NAME:-chat}"
+      MYSQL_USER: "${DB_USER:-chat_user}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-chat134!}"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: english-chat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:

@@ -1,0 +1,49 @@
+---
+description: MyEnglishChat 安卓 + 并列 Python 后端 backend；English-Chat 仅参考；须配合 docs/TECH-ARCHITECTURE.md
+alwaysApply: true
+---
+
+# My English Chat — 协作规则
+
+本工作区根目录为 **`AndroidStudioProjects`**，主要包含 **`MyEnglishChatApplication`**（安卓）、**【规划】`backend/`**（新 Python 后端）、**`English-Chat`**（历史网页，仅参考）。
+
+## 架构文档（必读）
+
+- **`docs/TECH-ARCHITECTURE.md`**：含 **`backend/`** 框架（Python + FastAPI）、**§5.2 后端通常包含哪些模块**、RTC 暂定方案、English-Chat 参考定位。
+- 调整模块边界、新增 API 或 RTC 选型落定时，**应同步更新**该文档。
+- 以仓库实际代码为准；【规划】未落地前**不得虚构**已存在的包或接口。
+
+## 产品与仓库边界
+
+- **唯一面向用户的产品界面**是 **`MyEnglishChatApplication`**（Kotlin + Jetpack Compose）。
+- **正式后端**为 **`backend/`**（Python，与 App 并列；落地后实现 FastAPI 等）。**App 的 HTTP/WebSocket 应对准 `backend` 部署**，而非维护 English-Chat 为线上 API。
+- **`English-Chat`**：**不再使用网页版产品**；**禁止**扩展其 HTML / JS / CSS。**允许**阅读其中 Python 与路由，作为重写 **`backend/`** 与理解业务流程的**参考**。
+- **不要**默认在 English-Chat 内新增功能来满足 MyEnglishChat；新能力写在 **App** 与 **`backend/`**。
+
+## 安卓与后端实现约定
+
+- **前端**：Compose + Material 3；新功能优先 **Screen / ViewModel / `data/`**，避免逻辑堆在 `MainActivity`。
+- **后端语言与框架**：**Python** + **FastAPI**；新代码放在 **`backend/`**，不要塞进 `MyEnglishChatApplication/app/`。
+- **LLM**：豆包等经 **`backend/` 转发**；**不要默认 Gemini**；密钥**不得**进客户端。
+- **ASR/TTS**：以**端侧（设备本地）**为主；不要默认依赖 English-Chat 上传转写，除非用户要求兼容。
+- **真人 / P2P**：暂定 **声网 Agora** 或 **腾讯云 TRTC**；Token 与敏感配置在**服务端**生成；客户端只集成 SDK。
+
+## 不要随意更改
+
+- **`applicationId` / 包名**（除非用户明确要求发新应用）。
+- 将 **English-Chat** 误当作必须对接的**线上**后端（除非用户明确说过渡期仍指向旧部署）。
+
+## 与非技术协作者的协作
+
+- 说明用**简体中文**；必要时「路径 + 一句人话」。
+- 小步提交；大改前征得确认。
+- Android Studio 操作写清菜单路径；**不要假设**用户会用命令行。
+- **不要主动新增**用户未要求的长篇文档（用户要求的架构/产品文档除外）。
+
+## 不确定时
+
+- 先提 **1～2 个澄清问题**，再做大改或架构决策。
+
+## 代码卫生与复用
+
+- 临时验证、可复用逻辑（「公式」）存放与收尾清理：见 **`.cursor/rules/code-hygiene-and-reuse.mdc`**；临时文件可放工作区 **`scratch/`**（根目录 `.gitignore` 已忽略）。

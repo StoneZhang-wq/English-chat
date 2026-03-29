@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - English Chat</title>
+    <link rel="stylesheet" href="/static/css/voice_chat.css">
+    <link rel="stylesheet" href="/static/css/user_management.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+</head>
+<body class="user-management-page">
+    <div class="um-wrapper">
+        <!-- 顶部：返回、标题、统计、搜索 -->
+        <header class="um-header">
+            <a href="/" class="um-back" id="um-back">← 返回</a>
+            <h1 class="um-title">用户管理</h1>
+            <div class="um-stats" id="um-stats">
+                <span class="um-stat"><strong id="um-total">0</strong> 总用户</span>
+                <span class="um-stat"><strong id="um-online">0</strong> 在线</span>
+            </div>
+            <div class="um-search-wrap">
+                <input type="text" id="um-search" class="um-search" placeholder="按账号搜索..." autocomplete="off">
+                <button type="button" id="um-search-btn" class="um-btn um-btn-primary">搜索</button>
+            </div>
+        </header>
+
+        <!-- 表格区域：支持滚动加载 -->
+        <div class="um-table-wrap" id="um-table-wrap">
+            <table class="um-table" id="um-table">
+                <thead>
+                    <tr>
+                        <th>账号</th>
+                        <th>昵称</th>
+                        <th>邮箱</th>
+                        <th>注册时间</th>
+                        <th>在线</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="um-tbody">
+                    <!-- 由 JS 填充 -->
+                </tbody>
+            </table>
+            <div class="um-loading" id="um-loading" style="display: none;">加载中...</div>
+            <div class="um-no-more" id="um-no-more" style="display: none;">没有更多了</div>
+            <div class="um-empty" id="um-empty" style="display: none;">暂无用户数据</div>
+        </div>
+    </div>
+
+    <!-- 编辑用户弹窗 -->
+    <div class="um-modal-overlay hidden" id="um-edit-modal">
+        <div class="um-modal">
+            <div class="um-modal-header">
+                <h3>编辑用户</h3>
+                <button type="button" class="um-modal-close" id="um-edit-close" aria-label="关闭">&times;</button>
+            </div>
+            <div class="um-modal-body">
+                <input type="hidden" id="um-edit-user-id">
+                <div class="um-form-group">
+                    <label for="um-edit-username">账号</label>
+                    <input type="text" id="um-edit-username" class="um-input" maxlength="64" placeholder="用户名">
+                </div>
+                <div class="um-form-group">
+                    <label for="um-edit-name">昵称</label>
+                    <input type="text" id="um-edit-name" class="um-input" maxlength="64" placeholder="昵称/姓名">
+                </div>
+                <div class="um-form-group">
+                    <label for="um-edit-email">邮箱</label>
+                    <input type="email" id="um-edit-email" class="um-input" maxlength="128" placeholder="邮箱">
+                </div>
+                <div class="um-form-group">
+                    <label for="um-edit-password">新密码（不填则不修改）</label>
+                    <input type="password" id="um-edit-password" class="um-input" placeholder="留空表示不修改密码">
+                </div>
+            </div>
+            <div class="um-modal-footer">
+                <button type="button" class="um-btn um-btn-secondary" id="um-edit-cancel">取消</button>
+                <button type="button" class="um-btn um-btn-primary" id="um-edit-save">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div class="um-modal-overlay hidden" id="um-delete-modal">
+        <div class="um-modal um-modal-sm">
+            <div class="um-modal-header">
+                <h3>确认删除</h3>
+                <button type="button" class="um-modal-close" id="um-delete-close" aria-label="关闭">&times;</button>
+            </div>
+            <div class="um-modal-body">
+                <p id="um-delete-message">确定要删除该用户吗？此操作不可恢复。</p>
+            </div>
+            <div class="um-modal-footer">
+                <button type="button" class="um-btn um-btn-secondary" id="um-delete-cancel">取消</button>
+                <button type="button" class="um-btn um-btn-danger" id="um-delete-confirm">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/core.js"></script>
+    <script src="/static/js/user_management.js"></script>
+</body>
+</html>

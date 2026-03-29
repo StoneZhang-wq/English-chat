@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv
+env
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Test & Doc
+.pytest_cache
+.coverage
+htmlcov
+*.md
+doc/
+
+# Logs & local data（避免覆盖挂载卷）
+logs/
+data/
+*.log
+
+# Optional
+*.egg-info
+dist
+build

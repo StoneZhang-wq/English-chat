@@ -1,0 +1,7 @@
+# Railway 使用 Nixpacks 构建时，用此命令启动（会读取环境变量 PORT）
+[start]
+cmd = "python run.py"
+
+# pydub 依赖 ffmpeg/ffprobe 做音频转换，必须安装
+[phases.setup]
+aptPkgs = ["ffmpeg"]

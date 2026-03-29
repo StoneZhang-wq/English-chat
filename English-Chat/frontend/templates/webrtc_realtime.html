@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OpenAI Realtime</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/webrtc_realtime.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="/frontend/static/favicon.ico" type="image/x-icon">
+</head>
+<body class="dark-mode">
+    <header>
+        <h1>
+            Voice Chat AI
+            <div id="mic-icon" class="mic-off">&#x1F399;</div>
+        </h1>
+        <div class="header-controls">
+            <button id="theme-toggle" aria-label="Toggle dark/light mode">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/">Dashboard</a></li>
+                    <li><a href="/enhanced">Enhanced</a></li>
+                    <li><a href="/webrtc_realtime" class="active">Realtime</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>OpenAI Realtime webRTC</h2>
+            <p>This feature uses OpenAI's Realtime API for continuous voice streaming. Speak naturally with the AI with minimal latency.</p>
+
+            <div class="status-container">
+                <span>Session Status:</span>
+                <span id="session-status" class="badge badge-secondary">Inactive</span>
+            </div>
+
+            <div class="controls-row">
+                <button id="startBtn" class="btn">Start Session</button>
+                <button id="stopBtn" class="btn" disabled>Stop Session</button>
+                <button id="clearBtn" class="btn">Clear Transcript</button>
+                <button id="testMicBtn" class="btn">Test Microphone</button>
+            </div>
+
+            <!-- Microphone test result display -->
+            <div id="micTestResult" style="display: none; margin: 10px 0; padding: 8px; border-radius: 4px; background-color: #1a1a1a; text-align: center;"></div>
+
+            <div class="character-selection">
+                <div class="form-group">
+                    <label for="character-select">Speaking as Character:</label>
+                    <select id="character-select" class="form-control" style="width: 300px; max-width: 100%;">
+                        {% for character in characters %}
+                        <option value="{{ character }}">{{ character }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="voice-select">Voice:</label>
+                    <select id="voice-select" class="form-control" style="width: 300px; max-width: 100%;">
+                        <option value="alloy">Alloy - female</option>
+                        <option value="ash">Ash - male</option>
+                        <option value="ballad">Ballad - male</option>
+                        <option value="coral">Coral - female</option>
+                        <option value="echo">Echo - male</option>
+                        <option value="sage">Sage - female</option>
+                        <option value="shimmer">Shimmer - female</option>
+                        <option value="verse">Verse - male</option>
+                    </select>
+                </div>
+            </div>
+
+            <p>Press the microphone button and start speaking. The AI will respond naturally as your conversation flows.</p>
+
+            <!-- Microphone button -->
+            <div class="mic-button-container">
+                <div class="mic-button" id="micBtn">
+                    <i class="fas fa-microphone"></i>
+                </div>
+                <p id="micStatus">Click to speak</p>
+            </div>
+
+            <!-- Voice visualizations -->
+            <div class="voice-container" style="margin-bottom: 20px;">
+                <div id="userVoiceVisualization" class="voice-visualization hidden"></div>
+                <div id="aiVoiceVisualization" class="voice-visualization hidden"></div>
+            </div>
+
+            <!-- Waiting indicator - hidden by default and only shown when needed -->
+            <div class="dots hidden" id="waitingIndicator"></div>
+
+            <h3>Activity Log</h3>
+            <div id="transcript" class="transcript-container" style="height: 200px; text-align: left;"></div>
+
+            <!-- Info Box -->
+            <div class="info-box-container">
+                <button id="infoToggleBtn" class="info-toggle-btn btn"><i class="fas fa-info-circle"></i> Show Usage Guide</button>
+                <div id="infoBox" class="info-box" style="display: none;">
+                    <h4>How to Use This Page</h4>
+                    <ul>
+                        <li><strong>Start a Conversation</strong>: Click the "Start Session" button, the first time you will have to approve microphone access in browser and then "Click to Speak" to begin a voice chat with the AI.</li>
+                        <li><strong>Speaking to the AI</strong>: When the microphone icon pulses red, your voice is being detected and sent to the AI. Pause once the AI is done talking and it will wait till it hears your voice again.</li>
+                        <li><strong>Microphone States</strong>:
+                            <ul>
+                                <li>Gray - Microphone inactive or session not started</li>
+                                <li>Yellow - Waiting for your voice</li>
+                                <li>Pulsing Red - Your voice is being detected</li>
+                            </ul>
+                        </li>
+                        <li><strong>Toggle Microphone</strong>: Use the microphone button to temporarily disable/enable your microphone.</li>
+                        <li><strong>Change Character</strong>: Select different AI characters from the dropdown menu. Make sure to stop the session select the character and start session.</li>
+                        <li><strong>Debug Panel</strong>: Access technical details by clicking "Show Debug Panel".</li>
+                        <li><strong>End Conversation</strong>: Click red mic and stop session to end the session.</li>
+                    </ul>
+                    <p><em>Note: This is a real-time voice conversation - the AI responds as you speak and you can interrupt the AI at any time. If 30mins of inactivity session will end. Setting gpt-4o-realtime-preview-2024-12-17 is recommended for better performance and following the character prompt</em></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p><a href="https://github.com/zhangyoujian/English-Chat" target="_blank">GitHub Repository</a></p>
+    </footer>
+
+    <!-- Initialize WebRTC configuration with model from server -->
+    <script>
+        const rtcConfig = {
+            model: "{{ realtime_model }}"
+        };
+    </script>
+
+    <!-- Include debug panel script and main script (contains theme toggle and other logic) -->
+   <!--  <script src="{{ url_for('static', path='js/debug_panel.js') }}"></script> -->
+    <script src="{{ url_for('static', path='js/webrtc_realtime.js') }}"></script>
+</body>
+</html>

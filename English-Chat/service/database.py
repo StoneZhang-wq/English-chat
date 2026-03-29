@@ -1,0 +1,37 @@
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from config import configer
+
+_mysql_url = f"mysql+aiomysql://{configer.db_user}:{configer.db_password}@{configer.db_host}:{configer.db_port}/{configer.db_name}?charset=utf8mb4"
+
+# 创建异步引擎
+async_engine = create_async_engine(
+    url=_mysql_url,
+    pool_recycle=3600,              # 回收超过 1 小时的连接（应小于 MySQL 的 wait_timeout）
+    echo=False,                     # 可选：输出SQL日志
+    pool_size=10,                   # 设置连接池中保持的持久连接数
+    max_overflow=20                 # 设置连接池允许创建的额外连接数
+)
+
+# 创建异步会话工厂
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+
+# 兼容旧代码
+async_session = AsyncSessionLocal
+
+
+# 依赖项，用于获取数据库会话（FastAPI Depends）
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
