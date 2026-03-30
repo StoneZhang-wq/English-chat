@@ -16,7 +16,7 @@
 
 - **用户**：需要在面试、会议、旅行、就医等场景中实际使用英语的学习者。
 - **价值**：在情境中开口练习；AI 反馈与重复练习；真人板块上线后可与他人角色扮演练习。
-- **形态**：**客户端**为 Flutter 应用（Android+iOS，目录 `app_flutter/`）；**服务端**为与客户端**并列目录** **`backend/`**（Python + FastAPI）；**English-Chat 不参与正式上线链路**；历史 `MyEnglishChatApplication/` 仅作迁移参考。
+- **形态**：**客户端**为 Flutter 应用（Android+iOS，目录 `app_flutter/`）；**服务端**为与客户端**并列目录** **`backend/`**（Python + FastAPI）；**English-Chat 不参与正式上线链路**。
 
 ---
 
@@ -63,4 +63,4 @@
 
 *随产品迭代更新。*
 
-技术架构见 **[TECH-ARCHITECTURE.md](./TECH-ARCHITECTURE.md)**（以 `app_flutter/` 为主线）。
+技术架构见 **[TECH-ARCHITECTURE.md](./TECH-ARCHITECTURE.md)**（Flutter 目录、API 与迭代见 §4）。

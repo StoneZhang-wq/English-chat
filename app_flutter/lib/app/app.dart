@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/echo_theme.dart';
-import '../features/home/home_screen.dart';
+import '../features/home/presentation/home_screen.dart';
 
 class MyEnglishChatApp extends StatelessWidget {
   const MyEnglishChatApp({super.key});

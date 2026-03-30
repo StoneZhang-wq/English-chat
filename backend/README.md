@@ -1,8 +1,8 @@
 # backend（MyEnglishChat 新后端 · 规划中）
 
-与 **`MyEnglishChatApplication/`** 并列。本目录为 **正式后端** 工程位置（**Python**，建议 **FastAPI**）。
+与 **`app_flutter/`** 并列。本目录为 **正式后端** 工程位置（**Python**，**FastAPI**）。
 
-详细**框架、分层、通常包含哪些模块**见工作区文档：**`docs/TECH-ARCHITECTURE.md` §5**。
+详细**框架、分层、能力清单**见 **`docs/TECH-ARCHITECTURE.md` §5**。
 
 ## 与 English-Chat 的关系
 
@@ -16,4 +16,4 @@
 - 场景、练习、会话等业务（按产品裁剪）
 - **P2P**：声网 Agora 或 腾讯云 TRTC 的 Token / 房间等（选型落定后补充）
 
-实现启动后请在本目录补充 `requirements.txt`、运行方式与环境变量说明。
+依赖见 **`requirements.txt`**；环境变量示例见 **`.env.example`**；本地启动：`python main.py`（端口默认 **8088**）。

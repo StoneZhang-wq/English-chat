@@ -1,0 +1,81 @@
+---
+description: MyEnglishChat 工作区边界、Flutter 主线约定、后端与 English-Chat 参考定位
+alwaysApply: true
+---
+
+# MyEnglishChat — 协作规则（主文件）
+
+## 1. 工作区与产品边界
+
+- **根目录**：工作区为 **`AndroidStudioProjects`**；**唯一交付给用户的 App** 在 **`app_flutter/`**（Flutter，Android + iOS）。
+- **正式后端**：**`backend/`**（Python + **FastAPI**）。Flutter 的 HTTP/WebSocket **对准本仓库 `backend` 部署**，不要把 **English-Chat** 当作线上 API 宿主（除非用户明确说过渡期仍指向旧环境）。
+- **English-Chat**：历史网页与旧服务端，**禁止**扩展其 HTML / JS / CSS；**允许**阅读其 Python 路由与业务，作为实现 **`backend/`** 与理解流程的**参考**。
+- **不要**在 English-Chat 里堆为满足 MyEnglishChat 的新能力；新能力写在 **`app_flutter/`** 与 **`backend/`**。
+
+## 2. 必读文档
+
+- **`docs/TECH-ARCHITECTURE.md`**：技术总览、**Flutter 目录与数据流**、后端模块清单（§5）、English-Chat 索引。
+- **`docs/MyEnglishChat-product-intro.md`**：产品叙述（与架构冲突时以**架构文档 + 代码**为准）。
+
+## 3. Flutter 客户端（`app_flutter/`）
+
+### 3.1 目录框架（顶层 · 固定约定）
+
+以下四层为**长期稳定**划分；新代码默认落在对应层，避免 `lib/` 根目录堆文件。
+
+```
+app_flutter/lib/
+├── main.dart
+├── app/                  # 应用壳：MaterialApp、仅「全局壳级」小组件（如 Echo 顶栏/底栏）
+├── core/                 # 与单一 feature 无关的可复用能力
+├── data/                 # 网络、DTO、Repository（只对接 backend / 外部 IO 抽象）
+└── features/             # 按产品功能分包（home / shadowing / session / practice / …）
+```
+
+**依赖方向（必须遵守）**
+
+- **`features/*`** → **`data/*`**、**`core/*`**
+- **`data/*`** → **`core/*`**
+- **禁止** **`data/*`** → **`features/*`**
+
+### 3.2 子目录与演进（细则单处维护）
+
+- **`core/`**：常见为 `config/`、`theme/`、`utils/`；录音/权限等**≥2 个 feature** 复用时再抽（如 `core/audio/`），避免空目录。
+- **`data/`**：`http/`、`dto/`、`repositories/`；DTO 与界面模型长期分叉时再加 **`mappers/`**。
+- **`features/<name>/`**：迁移期可**平铺** `*_screen.dart`；单文件同时扛 **UI + 状态机 + 网络** 难维护时，再拆 **`presentation/`**、**`application/`**；**`domain/`** 可选。
+- **何时拆、怎么抽公共代码的对照表**：只写在 **`docs/TECH-ARCHITECTURE.md` §4**，改规则时**不要**在 `.mdc` 里再复制一整表（避免双份过时）。
+
+### 3.3 语音与对话
+
+- **端侧优先**：录音 → 本地转写（**Vosk 规划落地**）→ 文本送 **`backend`** LLM。
+- **UX**（对齐已实现与目标）：松手后立刻上屏语音气泡「转写中…」，转写完成更新同一条；停录须 **先 stop-capture 再异步 finalize（IO）**，避免多录静音。
+- **密钥**：任何云厂商 / LLM Key **仅在 `backend/.env`**；客户端不得内置。
+
+### 3.4 Base URL
+
+- 使用 **`lib/core/config/env.dart`**；真机与模拟器通过 **`--dart-define=BACKEND_BASE_URL=...`** 切换（示例见该文件注释）。
+
+### 3.5 实现约定
+
+- UI：**Material 3**；新功能优先 **feature 分层 + 状态管理（如 Riverpod）+ `data/`**，避免大段逻辑堆在单个 Widget。
+- **LLM**：经 **`backend/`** 转发（如豆包 OpenAI 兼容接口）；**不要默认 Gemini**。
+- **ASR/TTS**：以**设备端**为主；后端可弱化上传转写，除非用户要求兼容。
+- **P2P / 真人**：暂定 **声网 Agora** 或 **腾讯云 TRTC**；Token 在**服务端**生成，客户端只接 SDK。
+
+## 4. 后端与协作习惯
+
+- 业务可复用逻辑在 **`backend/services/`**；路由只做校验与编排；详见 **`docs/TECH-ARCHITECTURE.md`** §5。
+- **不要随意更改** Flutter/Android **`applicationId`**、iOS **Bundle ID**（除非用户明确要求发新应用）。
+- 向非技术同事说明用**简体中文**；Android Studio 操作写清菜单路径；**不要假设**对方会用命令行。
+- **不要主动新增**用户未要求的长篇文档（产品/架构类更新除外）。
+- 临时脚本与一次性验证：`scratch/` 与 **`.cursor/rules/code-hygiene-and-reuse.mdc`**。
+
+## 5. 文档同步
+
+当 **Flutter 目录/演进约定**、**对外 API**、**语音链路** 或 **RTC 选型** 发生重大变化时，请更新 **`docs/TECH-ARCHITECTURE.md`**（§4 为 Flutter 目录权威说明）。
+
+## 6. 修改后小结（必须）
+
+- 每次完成修改并回复用户时，必须包含一个**简短小结**，至少说明：
+  - **修改了哪些**（点到为止，列出关键文件/模块）
+  - **目的是什么**（为什么改、解决什么问题）
