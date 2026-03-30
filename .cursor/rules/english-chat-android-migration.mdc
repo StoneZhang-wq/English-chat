@@ -5,7 +5,7 @@ alwaysApply: true
 
 # My English Chat — 协作规则
 
-本工作区根目录为 **`AndroidStudioProjects`**，主要包含 **`MyEnglishChatApplication`**（安卓）、**【规划】`backend/`**（新 Python 后端）、**`English-Chat`**（历史网页，仅参考）。
+本工作区根目录为 **`AndroidStudioProjects`**，主要包含 **`app_flutter/`**（Flutter 主客户端，Android+iOS）、`backend/`（Python 后端）、**`MyEnglishChatApplication`**（历史安卓，仅参考）、**`English-Chat`**（历史网页，仅参考）。
 
 ## 架构文档（必读）
 
@@ -15,14 +15,14 @@ alwaysApply: true
 
 ## 产品与仓库边界
 
-- **唯一面向用户的产品界面**是 **`MyEnglishChatApplication`**（Kotlin + Jetpack Compose）。
-- **正式后端**为 **`backend/`**（Python，与 App 并列；落地后实现 FastAPI 等）。**App 的 HTTP/WebSocket 应对准 `backend` 部署**，而非维护 English-Chat 为线上 API。
+- **唯一面向用户的产品界面**是 **`app_flutter/`**（Flutter + Material 3，Android+iOS）。
+- **正式后端**为 **`backend/`**（Python，与客户端并列；FastAPI）。**Flutter App 的 HTTP/WebSocket 应对准 `backend` 部署**，而非维护 English-Chat 为线上 API。
 - **`English-Chat`**：**不再使用网页版产品**；**禁止**扩展其 HTML / JS / CSS。**允许**阅读其中 Python 与路由，作为重写 **`backend/`** 与理解业务流程的**参考**。
 - **不要**默认在 English-Chat 内新增功能来满足 MyEnglishChat；新能力写在 **App** 与 **`backend/`**。
 
 ## 安卓与后端实现约定
 
-- **前端**：Compose + Material 3；新功能优先 **Screen / ViewModel / `data/`**，避免逻辑堆在 `MainActivity`。
+- **前端**：Flutter + Material 3；新功能优先 **feature 分层 + 状态管理（如 Riverpod）+ `data/`**，避免逻辑堆在单个 Widget 内。
 - **后端语言与框架**：**Python** + **FastAPI**；新代码放在 **`backend/`**，不要塞进 `MyEnglishChatApplication/app/`。
 - **LLM**：豆包等经 **`backend/` 转发**；**不要默认 Gemini**；密钥**不得**进客户端。
 - **ASR/TTS**：以**端侧（设备本地）**为主；不要默认依赖 English-Chat 上传转写，除非用户要求兼容。

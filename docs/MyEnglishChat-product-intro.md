@@ -2,13 +2,13 @@
 
 ## 产品名称与品牌
 
-**MyEnglishChat** 为当前主产品（Android 应用）。历史项目 **English-Chat（EchoEnglish 网页版）** **不再作为产品使用**，仅保留在仓库中作为**业务与接口设计的参考**，用于对照重写**移动端**与**新后端**。
+**MyEnglishChat** 为当前主产品（Flutter 应用：Android+iOS）。历史项目 **English-Chat（EchoEnglish 网页版）** **不再作为产品使用**，仅保留在仓库中作为**业务与接口设计的参考**，用于对照重写**移动端**与**新后端**。
 
 ---
 
 ## 一句话介绍
 
-**MyEnglishChat 是一款面向真实情境的英语口语练习 Android 应用，结合场景化练习、AI 对话与开发中的真人互动；语音识别与合成以设备端为主；对话与账号等通过自有的 Python 新后端对接大模型；真人语音暂定接入声网或腾讯云实时音视频。**
+**MyEnglishChat 是一款面向真实情境的英语口语练习移动应用（Flutter：Android+iOS），结合场景化练习、AI 对话与开发中的真人互动；语音识别与合成以设备端为主；对话与账号等通过自有的 Python 后端对接大模型；真人语音暂定接入声网或腾讯云实时音视频。**
 
 ---
 
@@ -16,7 +16,7 @@
 
 - **用户**：需要在面试、会议、旅行、就医等场景中实际使用英语的学习者。
 - **价值**：在情境中开口练习；AI 反馈与重复练习；真人板块上线后可与他人角色扮演练习。
-- **形态**：**客户端**为 Android 原生应用；**服务端**为与客户端**并列目录** **`backend/`**（Python + FastAPI，规划中）；**English-Chat 不参与正式上线链路**。
+- **形态**：**客户端**为 Flutter 应用（Android+iOS，目录 `app_flutter/`）；**服务端**为与客户端**并列目录** **`backend/`**（Python + FastAPI）；**English-Chat 不参与正式上线链路**；历史 `MyEnglishChatApplication/` 仅作迁移参考。
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 技术说明（简版）
 
-- **客户端**：Kotlin + Jetpack Compose，Material 3；界面风格对齐历史 EchoEnglish 信息架构（三 Tab）。
+- **客户端**：Flutter + Material 3；界面风格对齐历史 EchoEnglish 信息架构（三 Tab）。
 - **语音**：ASR / TTS 以**端侧**为主（规划与迭代中）。
 - **大模型**：云端 LLM，经 **`backend/`（Python FastAPI）** 代理；**English-Chat 不作为正式 API 宿主**。
 - **真人**：**声网 / 腾讯云 TRTC** 二选一待定；服务端配置与 Token，客户端集成官方 SDK。
@@ -63,4 +63,4 @@
 
 *随产品迭代更新。*
 
-技术架构见 **[TECH-ARCHITECTURE.md](./TECH-ARCHITECTURE.md)**。
+技术架构见 **[TECH-ARCHITECTURE.md](./TECH-ARCHITECTURE.md)**（以 `app_flutter/` 为主线）。

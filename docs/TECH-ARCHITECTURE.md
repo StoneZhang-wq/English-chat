@@ -23,8 +23,9 @@
 
 | 路径 | 角色 | 说明 |
 |------|------|------|
-| `MyEnglishChatApplication/` | **Android 客户端（主产品）** | Kotlin、Jetpack Compose，`applicationId`: `com.example.englishchat` |
-| `backend/` | **【规划】新后端（Python）** | 与 App **并列**；**正式对外 API 以本目录为准**（落地后创建代码；当前见 `backend/README.md`） |
+| `app_flutter/` | **Flutter 客户端（主产品：Android+iOS）** | Flutter（Dart）+ Material 3；统一 UI 与业务逻辑；通过 HTTPS/WebSocket 对接 `backend/` |
+| `MyEnglishChatApplication/` | **历史 Android 客户端（参考/过渡）** | Kotlin、Jetpack Compose；用于对照迁移与临时验证；不再作为长期主线 |
+| `backend/` | **新后端（Python）** | 与客户端 **并列**；**正式对外 API 以本目录为准** |
 | `English-Chat/` | **历史网页版（归档参考）** | **不再作为上线产品使用**；其中 FastAPI、路由、业务逻辑仅作**重写后端/理解流程时的参考**，不扩展网页前端 |
 | `docs/` | **文档** | 产品介绍、本架构说明等 |
 | `.cursor/rules/` | **AI 与协作规则** | 与本文互补；冲突时以**用户最新明确指令**为准 |
@@ -35,16 +36,16 @@
 
 ```mermaid
 flowchart LR
-  subgraph device [Android 设备]
-    UI[Compose UI]
-    VM[ViewModel 规划]
-    LocalASR[ASR 端侧 规划]
-    LocalTTS[TTS 端侧 规划]
-    UI --> VM
-    VM --> LocalASR
-    VM --> LocalTTS
+  subgraph device [移动设备（Android / iOS）]
+    UI[Flutter UI]
+    State[State Management]
+    LocalASR[ASR 端侧（Vosk 规划/落地）]
+    LocalTTS[TTS 端侧（系统/插件）]
+    UI --> State
+    State --> LocalASR
+    State --> LocalTTS
   end
-  subgraph backendNode [新后端 规划 backend]
+  subgraph backendNode [后端 backend]
     API[Python FastAPI]
     DB[(数据库 规划)]
     LLM[豆包等 LLM 转发]
@@ -60,14 +61,36 @@ flowchart LR
   VM -.->|SDK Token 等 规划| TRTC
 ```
 
-**【现状】**：App 侧 **尚未** 接入 Retrofit/OkHttp；**尚未** 实现 ViewModel 与端侧 ASR/TTS 模块；**`backend/`** 可能仅有 README 占位。  
-**【规划】**：业务状态进 **ViewModel**；网络进 **`data/`**，**Base URL 指向 `backend/` 部署地址**；ASR/TTS 在端侧实现；LLM 经 **`backend`** 转发，密钥仅在后端；**P2P** 暂定 **声网 Agora** 或 **腾讯云 TRTC**。
+**【现状】**：Flutter 客户端骨架将落地于 `app_flutter/`；现有 `MyEnglishChatApplication/` 仅作迁移参考。  
+**【规划】**：Flutter 端用清晰的 feature 分层 + 状态管理；网络请求集中在 `data/`（Dart）并指向 `backend/` 部署地址；ASR 优先端侧（Vosk），LLM 经 `backend` 转发，密钥仅在后端；**P2P** 暂定 **声网 Agora** 或 **腾讯云 TRTC**。
 
 **English-Chat**：不参与上图中「正式链路」；仅作**对照实现**时的阅读材料。
 
 ---
 
-## 4. Android 应用（MyEnglishChatApplication）
+## 4. Flutter 应用（`app_flutter/`，主客户端）
+
+### 4.1 现状与目标
+
+- **主客户端目录**：`app_flutter/`
+- **目标平台**：Android + iOS
+- **状态管理**：建议 Riverpod（骨架已引入）
+- **网络**：建议 Dio（骨架已引入），Base URL 可配置（debug/真机/模拟器）
+- **语音**：端侧离线（Vosk）为主线；录音→本地转写→再请求 `backend` 获取 LLM 回复
+
+### 4.2 目录结构（落地骨架）
+
+```
+app_flutter/
+├── lib/
+│   ├── app/
+│   ├── core/
+│   ├── data/
+│   └── features/
+└── pubspec.yaml
+```
+
+## 5. 历史 Android 应用（MyEnglishChatApplication，参考/过渡）
 
 ### 4.1 【现状】包与文件职责
 
@@ -116,7 +139,7 @@ com.example.englishchat/
 
 ---
 
-## 5. 新后端（【规划】`backend/`）
+## 6. 后端（`backend/`）
 
 ### 5.1 框架与架构（明确说明）
 
@@ -173,7 +196,7 @@ backend/
 
 ---
 
-## 6. English-Chat（仅参考，非正式后端）
+## 7. English-Chat（仅参考，非正式后端）
 
 ### 6.1 定位
 
@@ -195,7 +218,7 @@ backend/
 
 ---
 
-## 7. 安全与配置
+## 8. 安全与配置
 
 - **客户端**：不得提交真实 API Key；`local.properties` / 构建配置仅放环境占位。
 - **`backend`**：密钥在 `.env` 或部署平台环境变量。
@@ -204,7 +227,7 @@ backend/
 
 ---
 
-## 8. 新功能开发检查清单（建议）
+## 9. 新功能开发检查清单（建议）
 
 1. 确认功能属于 **App** 还是 **`backend/`**，是否需 **RTC**。  
 2. 若 English-Chat 有类似能力：**只作对照**，在 **App + backend** 实现，**不**在 English-Chat 上开新网页功能。  
@@ -215,7 +238,7 @@ backend/
 
 ---
 
-## 9. 相关文件速查
+## 10. 相关文件速查
 
 | 说明 | 路径 |
 |------|------|

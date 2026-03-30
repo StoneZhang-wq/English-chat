@@ -13,6 +13,13 @@ scratch/
 # IDE（可由 Android Studio 重新生成）
 .idea/
 
+# Flutter / Dart
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
 # Python
 __pycache__/
 *.pyc

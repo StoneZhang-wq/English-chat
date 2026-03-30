@@ -18,7 +18,8 @@ alwaysApply: true
 
 - **原则**：相同算法、校验、格式化、提示词拼装等，**只实现一次**，其它地方 **import / 调用**。
 - **存放（本仓库约定）**：
-  - **`MyEnglishChatApplication`**：与 UI 无关的共用 Kotlin 逻辑 → **`core/`** 或 **`util/`**（若目录尚不存在，新建时与现有 `data/`、`ui/` 分层一致）；禁止在多个 `Screen` 里复制同一段长逻辑。
+  - **`app_flutter/`**：可复用 Dart 逻辑优先放 **`lib/core/`**；与后端对接放 **`lib/data/`**；禁止在多个 Widget/Screen 里复制同一段长逻辑。
+  - **`MyEnglishChatApplication`**：历史 Kotlin 端仅作对照；除非用户明确要求，否则不再新增可复用逻辑。
   - **`backend/`**：业务可复用 → **`services/`**；纯工具函数 → **`utils/`**；路由 **`routers/`** 只做参数校验与编排，不写大块可复用算法。
 - **命名**：按主题拆文件（例如 `PromptBuilder`、`text_normalize`），避免单文件无限堆叠。
 
