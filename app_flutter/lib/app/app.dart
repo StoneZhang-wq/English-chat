@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/theme/echo_theme.dart';
 import '../features/home/home_screen.dart';
 
 class MyEnglishChatApp extends StatelessWidget {
@@ -9,10 +10,7 @@ class MyEnglishChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyEnglishChat',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4CAF50)),
-        useMaterial3: true,
-      ),
+      theme: buildEchoTheme(),
       home: const HomeScreen(),
     );
   }

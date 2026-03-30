@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../shadowing/shadowing_home_screen.dart';
+import '../practice/practice_home_screen.dart';
+import '../p2p/p2p_home_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -17,9 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: IndexedStack(
         index: _index,
         children: const [
-          _TabPlaceholder(title: 'Shadowing'),
-          _TabPlaceholder(title: 'Practice'),
-          _TabPlaceholder(title: 'P2P'),
+          ShadowingHomeScreen(),
+          PracticeHomeScreen(),
+          P2pHomeScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
@@ -39,22 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'P2P',
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TabPlaceholder extends StatelessWidget {
-  final String title;
-  const _TabPlaceholder({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '$title（Flutter 骨架已就绪，功能迁移中）',
-        style: Theme.of(context).textTheme.titleMedium,
-        textAlign: TextAlign.center,
       ),
     );
   }
