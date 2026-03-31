@@ -8,7 +8,7 @@
 
 ## 一句话介绍
 
-**MyEnglishChat 是一款面向真实情境的英语口语练习移动应用（Flutter：Android+iOS），结合场景化练习、AI 对话与开发中的真人互动；语音识别与合成以设备端为主；对话与账号等通过自有的 Python 后端对接大模型；真人语音暂定接入声网或腾讯云实时音视频。**
+**MyEnglishChat 是一款面向真实情境的英语口语训练移动应用（Flutter：Android+iOS）：以 Learn（AI 学习与陪练）完成从“输入（听）”到“输出（说）”的闭环训练，再通过 P2P Match（真人 1v1 语境实战）在真实压力下检验效果，并在 Profile 沉淀数据与设置；ASR/TTS 以端侧为主，LLM 统一经自有 FastAPI 后端转发。**
 
 ---
 
@@ -22,27 +22,34 @@
 
 ## 功能板块（用户视角）
 
-### 1）场景与练习（Shadowing）
+### 1）Learn（核心学习与 AI 陪练）
 
-选择或搜索情境并进入练习流程。实现时对照 English-Chat 中场景与练习相关逻辑，在**新后端与 App**中重写。
+- **场景探索（Scenario Discovery）**：支持层级筛选  
+  - 大场景（如职场）→ 小场景（如面试）→ NPC（如 HR Heather）→ 具体话题（如行为面试题）  
+  - 支持全局搜索关键词（如 “Coffee / Order / Interview”）快速直达剧本
+- **学习模式三部曲（Learning Modes）**：选定话题后进入学习界面，通过顶部 Tab 切换三种递进模式  
+  - **Mode A：Shadowing（沉浸式跟读，练发音）**：播放原音（原速/慢速）+ 按住录音模仿；提供波形反馈与简单发音相似度提示  
+  - **Mode B：Practice（剧本角色扮演，练流利度）**：按既定剧本分角色朗读；轮到用户时提供提词器；用户语音输入后 AI 自动接下一句  
+  - **Mode C：AI Dialogue（开放式自由对话，练应变）**：给定任务目标（Task）+ NPC 人设；用户自由语音输入；支持 “Hint（提示）”给一句推荐表达
+- **学习反馈（Performance Review）**：在 Practice 或 AI Dialogue 结束后生成复盘报告，指出语法/发音问题并提供更地道表达建议
 
-### 2）AI 对话（AI Dialogue）
+### 2）P2P Match（真人 1v1 语境实战）——开发中
 
-按主题进入对话式练习。大模型经 **新后端** 转发与鉴权（豆包等），密钥不在 App 内。
+- **剧本大厅（Scenario Lobby）**：选择刚在 Learn 练过的场景，或从 Trending 挑选一个场景作为通话剧本  
+- **智能匹配（Smart Match）**：匹配同/相似场景的用户；雷达搜索动画；成功后进入实战房间  
+- **实战房间（Roleplay Room）**：音视频/纯语音通话；明确角色分配与任务目标（Task）；提供破冰提示词与场景词汇；支持 Role Swap 再练一轮  
 
-### 3）真人互动（P2P Roleplay）——开发中
+实时音视频能力暂定接入 **声网 Agora** 或 **腾讯云 TRTC**；Token 由 **新后端**签发，客户端仅集成官方 SDK。
 
-与其他学习者进行语音对话练习。**暂定**使用 **声网 Agora** 或 **腾讯云 TRTC** 等实时音视频服务；由**新后端**签发 Token 等；**当前移动端为开发中**。
+### 3）Profile / Settings（个人中心与数据沉淀）
 
-### 4）账号与个人
-
-登录、退出与学习档案，由 **新后端** 提供接口（可参考 English-Chat 账号设计，不强制兼容旧库）。
+登录、学习记录与偏好设置等；由 **新后端** 提供接口（可参考 English-Chat 账号设计，不强制兼容旧库）。
 
 ---
 
 ## 技术说明（简版）
 
-- **客户端**：Flutter + Material 3；界面风格对齐历史 EchoEnglish 信息架构（三 Tab）。
+- **客户端**：Flutter + Material 3；底部三主板块：**Learn / P2P Match / Profile**。
 - **语音**：ASR / TTS 以**端侧**为主（规划与迭代中）。
 - **大模型**：云端 LLM，经 **`backend/`（Python FastAPI）** 代理；**English-Chat 不作为正式 API 宿主**。
 - **真人**：**声网 / 腾讯云 TRTC** 二选一待定；服务端配置与 Token，客户端集成官方 SDK。
@@ -54,10 +61,10 @@
 
 | 原 English-Chat（仅参考） | MyEnglishChat（实现目标） |
 |---------------------------|---------------------------|
-| 场景、练习、语音相关逻辑 | **Shadowing** |
-| AI 对话、实时链路思路 | **AI Dialogue** |
-| 真人 1v1 思路 | **P2P**（RTC + 新后端） |
-| 账号体系思路 | 顶栏与个人（新后端） |
+| 场景、练习、语音相关逻辑 | **Learn**（Shadowing / Practice / AI Dialogue） |
+| AI 对话、实时链路思路 | **Learn → AI Dialogue** |
+| 真人 1v1 思路 | **P2P Match**（RTC + 新后端） |
+| 账号体系思路 | **Profile / Settings**（新后端） |
 
 ---
 

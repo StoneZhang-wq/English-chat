@@ -18,11 +18,15 @@ dependencies:
   # Networking
   dio: ^5.7.0
 
+  # On-device TTS (Piper via ONNX Runtime)
+  runanywhere: ^0.16.0
+  runanywhere_onnx: ^0.16.0
+
   # Audio record / playback (placeholders for next iteration)
   # 6.x 与当前 record_platform_interface 对齐；5.x 的 record_linux 会编译失败
   record: ^6.2.0
   just_audio: ^0.9.40
-  flutter_tts: ^4.1.0
+  flutter_tts: ^3.8.5
 
   google_fonts: ^6.2.1
 

@@ -94,12 +94,11 @@ app_flutter/lib/
 ├── core/          # config/env、theme
 ├── data/          # http、dto、repositories
 └── features/
-    ├── home/presentation/
-    ├── shadowing/domain/、presentation/
-    ├── session/presentation/
-    ├── practice/domain/、presentation/
-    ├── ai_dialogue/presentation/
-    └── p2p/presentation/
+    ├── home/presentation/            # App 壳：EchoTopBar + 内容区 + EchoBottomBar
+    ├── learn/domain/、presentation/   # Learn：Category→Scenario→Character→Topic→Session（3 mode）
+    ├── profile/presentation/         # Profile：占位（后续承接个人中心/设置/数据）
+    ├── p2p_match/presentation/        # P2P Match：当前占位（后续按 Lobby/Match/Room 扩展）
+    └── （迁移期保留）shadowing/、practice/、ai_dialogue/、session/
 ```
 
 ### 4.3 目录演进：何时调整、怎么动
@@ -114,12 +113,30 @@ app_flutter/lib/
 
 结构性变更后更新 **本节**；协作规则 **`.cursor/rules/myenglishchat.mdc`** 仅保留指针，**不重复粘贴本表**。
 
-### 4.4 导航与产品入口（现状）
+### 4.4 导航与产品入口（现状 & 规划）
 
-- **外壳**：`HomeScreen` — `EchoTopBar` + **三 Tab 内容区** + `EchoBottomBar`；底栏路由名：`shadowing`、`ai_dialogue`、`p2p`。
-- **Shadowing**：`ShadowingTabNavigator` 内嵌 **`Navigator`** — 场景列表 → **`ScenarioSessionScreen`** 时**底栏仍显示**（全屏 push 会破坏该行为）。
-- **场景内**：`ScenarioSessionScreen` — 子 Tab **Shadowing**（跟读面板） / **Practice**（**`PracticeSessionPanel`**）。
-- **Practice 与 LLM**：`PracticeChatRepository` → **`POST /api/practice/chat`**；请求体为 `messages`（user/assistant 文本或语音转写）+ 可选 `scenario_title`。
+**【现状（代码）】**
+
+- **外壳**：`HomeScreen` — `EchoTopBar` + 内容区 + `EchoBottomBar`  
+  - 当前底栏路由名：`learn`、`p2p_match`、`profile`
+- **Learn**：`LearnNavigator` 内嵌 **`Navigator`** — Category → Scenario → Character → Topic → Session（3 mode）
+- **Learn Session**：顶部 Tab **Shadowing / Practice / AI Dialogue**  
+  - Practice / AI Dialogue：复用 `PracticeSessionPanel`（语音气泡、翻译、优化、分数等 UI 保持一致）
+- **Practice 与 LLM**：`PracticeChatRepository` → **`POST /api/practice/chat`**；请求体为 `messages` + 可选 `scenario_title`（当前 Learn Session 也复用该链路）
+
+**【规划（产品 IA）】**
+
+- **底部主导航（3 个板块）**
+  - **Learn**：AI 学习与练习（核心闭环：输入/听 → 输出/说）
+  - **P2P Match**：真人 1v1 语境实战（Lobby → Match → Room）
+  - **Profile**：个人中心与设置（学习数据沉淀）
+- **Learn 内部学习界面（顶部 Tab 三连）**
+  - **Mode A：Shadowing**（沉浸式跟读，练发音）
+  - **Mode B：Practice**（剧本角色扮演，练流利度）
+  - **Mode C：AI Dialogue**（开放式自由对话，练应变）
+- **Review（学习反馈）**：Practice / AI Dialogue 结束后生成复盘报告（语法/发音/更地道表达）
+
+> 注：规划落地时，Flutter `features/` 的边界将以 **Learn / P2P Match / Profile** 为一级模块；现存 `shadowing/practice/ai_dialogue/p2p` 可逐步迁移或并存过渡，避免一次性大重构。
 
 ### 4.5 语音与 LLM UX（目标与现状）
 
@@ -129,6 +146,28 @@ app_flutter/lib/
 | 语音气泡 | 立即上屏「转写中…」，完成后更新同一条 | UI 已有；转写为占位 |
 | 转写 | 端侧 **Vosk**，预取模型 | 未接 |
 | LLM | 仅经 **`backend`** | 已接 `practice/chat` |
+
+#### 4.5.1 端侧模型资源策略（Vosk / 离线 TTS）：不重复下载
+
+**目标**：在开发调试与推广阶段，端侧模型/语音资源做到 **“最多下载一次（或随包）”**，避免每次测试反复下载。
+
+- **存放位置（必须持久化）**
+  - 禁止放 cache/tmp（系统可能清理导致重复下载）
+  - 选择 documents / applicationSupport 等持久化目录（平台由实现层决定）
+
+- **版本与更新（必须）**
+  - 每个资源目录必须带 **版本标记**（如 `model.version` 或 `manifest.json`）
+  - 启动或进入功能前：先检查版本是否命中；**命中直接复用**；不命中才触发下载/解压
+  - 下载/解压必须 **原子更新**（`*.partial` → 校验 → rename），防止中断造成坏缓存
+
+- **Vosk（ASR）**
+  - 支持两种交付：
+    - **随包**：无需下载，但增大安装包体积
+    - **首次下载并缓存**：仅首次下载一次，后续按版本更新
+
+- **离线 TTS**
+  - 若采用 **系统 TTS（Android/iOS）**：离线语音包由系统安装（测试/用户只需一次性下载）；App 不重复下载
+  - 若采用 **自带离线 TTS 引擎/模型**：同 Vosk，首次下载并缓存 + 版本更新
 
 **Base URL**：默认 Android 模拟器 **`http://10.0.2.2:8088/`**；真机用  
 `flutter run --dart-define=BACKEND_BASE_URL=http://<电脑局域网IP>:8088/`。
@@ -206,6 +245,18 @@ backend/
 - **`backend/.env`**：`OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL` 等（见 **`backend/.env.example`**）。
 - **RTC**：App ID / 证书等在**服务端**。
 - **Flutter `applicationId` / iOS Bundle ID**：非必要不改。
+
+## 7.1 商业化与许可（待确认）
+
+**现状**：为实现端侧 Piper TTS（离线英文两音色 + 可下载更多音色），Flutter 端已引入第三方依赖 `runanywhere` / `runanywhere_onnx`（ONNX Runtime 后端）。
+
+**风险点**：这两项依赖在其发布页声明使用 **RunAnywhere License**（基于 Apache 2.0 但包含额外条款），与常见 MIT/Apache2/BSD 的“直接商用”许可不同。若未来确定 **商业化/上架/付费**，需在发布前完成以下动作：
+
+- **确认许可**：阅读并确认其 License 条款是否满足商业化分发与闭源/开源策略。
+- **必要时更换方案**：若不满足，改为完全开源可商用的 Piper + ONNX Runtime 方案（自集成或选择合适许可的推理库）。
+- **模型许可**：Piper voice（不同 voice）可能有不同 license，需一并核对。
+
+> 本节为“记录待办”，不阻塞当前开发调试；但上线前必须完成合规确认。
 
 ---
 

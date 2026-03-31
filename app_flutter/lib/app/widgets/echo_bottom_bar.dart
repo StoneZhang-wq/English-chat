@@ -4,7 +4,7 @@ import '../../core/theme/echo_theme.dart';
 
 /// 对齐 Kotlin [com.example.englishchat.ui.components.EchoBottomBar]
 ///
-/// [routes] 与 [onNavigate] 使用与 Android 端一致的 route 名：`shadowing` / `ai_dialogue` / `p2p`
+/// [routes] 与 [onNavigate] 使用与产品 IA 一致的 route 名：`learn` / `p2p_match` / `profile`
 class EchoBottomBar extends StatelessWidget {
   final String currentRoute;
   final ValueChanged<String> onNavigate;
@@ -16,9 +16,9 @@ class EchoBottomBar extends StatelessWidget {
   });
 
   static const _items = [
-    _EchoNavItem(route: 'shadowing', label: 'SHADOWING', icon: Icons.mic),
-    _EchoNavItem(route: 'ai_dialogue', label: 'AI DIALOGUE', icon: Icons.auto_awesome),
-    _EchoNavItem(route: 'p2p', label: 'P2P ROLEPLAY', icon: Icons.people),
+    _EchoNavItem(route: 'learn', label: 'LEARN', icon: Icons.school),
+    _EchoNavItem(route: 'p2p_match', label: 'P2P MATCH', icon: Icons.people),
+    _EchoNavItem(route: 'profile', label: 'PROFILE', icon: Icons.settings),
   ];
 
   @override

@@ -29,7 +29,7 @@ app_flutter/lib/
 ├── app/                  # 应用壳：MaterialApp、仅「全局壳级」小组件（如 Echo 顶栏/底栏）
 ├── core/                 # 与单一 feature 无关的可复用能力
 ├── data/                 # 网络、DTO、Repository（只对接 backend / 外部 IO 抽象）
-└── features/             # 按产品功能分包（home / shadowing / session / practice / …）
+└── features/             # 按产品功能分包（Learn / P2P Match / Profile；以及迁移期的 shadowing/practice/ai_dialogue 等）
 ```
 
 **依赖方向（必须遵守）**
@@ -42,7 +42,7 @@ app_flutter/lib/
 
 - **`core/`**：常见为 `config/`、`theme/`、`utils/`；录音/权限等**≥2 个 feature** 复用时再抽（如 `core/audio/`），避免空目录。
 - **`data/`**：`http/`、`dto/`、`repositories/`；DTO 与界面模型长期分叉时再加 **`mappers/`**。
-- **`features/<name>/`**：迁移期可**平铺** `*_screen.dart`；单文件同时扛 **UI + 状态机 + 网络** 难维护时，再拆 **`presentation/`**、**`application/`**；**`domain/`** 可选。
+- **`features/<name>/`**：允许迁移期平铺 `*_screen.dart`，但**默认优先**按 `presentation/`、`domain/`（可选）组织；当需要引入状态管理与编排逻辑时再加 `application/`（Controller/Notifier 等）。
 - **何时拆、怎么抽公共代码的对照表**：只写在 **`docs/TECH-ARCHITECTURE.md` §4**，改规则时**不要**在 `.mdc` 里再复制一整表（避免双份过时）。
 
 ### 3.3 语音与对话
@@ -50,6 +50,25 @@ app_flutter/lib/
 - **端侧优先**：录音 → 本地转写（**Vosk 规划落地**）→ 文本送 **`backend`** LLM。
 - **UX**（对齐已实现与目标）：松手后立刻上屏语音气泡「转写中…」，转写完成更新同一条；停录须 **先 stop-capture 再异步 finalize（IO）**，避免多录静音。
 - **密钥**：任何云厂商 / LLM Key **仅在 `backend/.env`**；客户端不得内置。
+
+### 3.3.1 端侧模型资源（Vosk / 离线 TTS）——避免重复下载（必须）
+
+目标：在 **开发调试阶段** 与 **未来推广阶段**，端侧模型/语音资源都应做到 **“最多下载一次”**（或直接随包），避免每次测试/升级都重复下载浪费时间与流量。
+
+- **统一原则**
+  - **不把大模型文件放进临时目录**（如 cache/tmp），避免系统清理导致反复下载。
+  - 资源应落在 **持久化目录**（App documents / applicationSupport 等）并带 **版本号**；启动时先检查版本标记，**命中则复用**。
+  - 下载/解压使用 **原子更新**：先写到 `*.partial`，校验通过后再 rename 为正式目录，避免中断导致坏缓存。
+
+- **Vosk ASR 模型**
+  - **开发阶段**：允许“手动预置”或“首次下载并缓存”，但都必须落在持久化目录，并有 `model.version`（或同等标记）用于判断是否需要更新。
+  - **推广阶段**：优先选择 **随包内置** 或 **首次下载一次后长期复用**（同样按版本号更新，不重复下载）。
+
+- **离线 TTS**
+  - 若采用 **系统 TTS（Android/iOS）**：测试设备需要**一次性**安装对应语言的离线语音包；App 内不重复下载。
+  - 若采用 **自带离线 TTS 引擎/模型**：与 Vosk 相同，必须持久化缓存 + 版本标记 + 原子更新，做到最多下载一次。
+
+实现细节（目录、版本字段与 UX）以 **`docs/TECH-ARCHITECTURE.md` §4.5** 为权威说明。
 
 ### 3.4 Base URL
 
@@ -61,6 +80,20 @@ app_flutter/lib/
 - **LLM**：经 **`backend/`** 转发（如豆包 OpenAI 兼容接口）；**不要默认 Gemini**。
 - **ASR/TTS**：以**设备端**为主；后端可弱化上传转写，除非用户要求兼容。
 - **P2P / 真人**：暂定 **声网 Agora** 或 **腾讯云 TRTC**；Token 在**服务端**生成，客户端只接 SDK。
+
+### 3.6 产品信息架构（目录命名的依据）
+
+- **底部主导航**：**Learn / P2P Match / Profile**
+- **Learn 内部学习模式（顶部 Tab）**：**Shadowing / Practice / AI Dialogue**
+- **反馈**：Practice / AI Dialogue 结束后进入 Review（复盘报告）
+
+目录落地建议（可按迭代逐步迁移，避免大重构）：
+
+- `features/learn/`：场景探索（Scenario Discovery）+ 学习三模式壳（Shadowing/Practice/AI Dialogue）+ Review
+- `features/p2p_match/`：Lobby → Match → Room（含 Role Swap、提示词等 UI）
+- `features/profile/`：个人中心、学习数据、设置
+
+> 迁移期允许保留既有 `features/shadowing`、`features/practice`、`features/ai_dialogue`（以及历史命名的 `features/p2p_match` 已完成迁移），但新增功能优先落在上述三级信息架构对应目录。
 
 ## 4. 后端与协作习惯
 

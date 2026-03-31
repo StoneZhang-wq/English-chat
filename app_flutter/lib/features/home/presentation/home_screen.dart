@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../../../app/widgets/echo_bottom_bar.dart';
 import '../../../app/widgets/echo_top_bar.dart';
-import '../../ai_dialogue/presentation/ai_dialogue_home_screen.dart';
-import '../../p2p/presentation/p2p_home_screen.dart';
-import '../../shadowing/presentation/shadowing_tab_navigator.dart';
+import '../../learn/presentation/learn_navigator.dart';
+import '../../p2p_match/presentation/p2p_navigator.dart';
+import '../../profile/presentation/profile_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,10 +15,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<NavigatorState> _shadowingNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _learnNavKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _p2pNavKey = GlobalKey<NavigatorState>();
 
-  /// 与 Kotlin `AppRoute` 一致：`shadowing` / `ai_dialogue` / `p2p`
-  String _route = 'shadowing';
+  /// 产品底栏：`learn` / `p2p_match` / `profile`
+  String _route = 'learn';
 
   void _onBottomNavigate(String route) {
     setState(() => _route = route);
@@ -26,11 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int get _stackIndex {
     switch (_route) {
-      case 'ai_dialogue':
+      case 'p2p_match':
         return 1;
-      case 'p2p':
+      case 'profile':
         return 2;
-      case 'shadowing':
+      case 'learn':
       default:
         return 0;
     }
@@ -39,7 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _handleSystemBack(bool didPop, dynamic result) {
     if (didPop) return;
     if (_stackIndex == 0) {
-      final nav = _shadowingNavKey.currentState;
+      final nav = _learnNavKey.currentState;
+      if (nav != null && nav.canPop()) {
+        nav.pop();
+        return;
+      }
+    } else if (_stackIndex == 1) {
+      final nav = _p2pNavKey.currentState;
       if (nav != null && nav.canPop()) {
         nav.pop();
         return;
@@ -62,9 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: IndexedStack(
                   index: _stackIndex,
                   children: [
-                    ShadowingTabNavigator(navigatorKey: _shadowingNavKey),
-                    const AiDialogueHomeScreen(),
-                    const P2pHomeScreen(),
+                    LearnNavigator(navigatorKey: _learnNavKey),
+                    P2pNavigator(navigatorKey: _p2pNavKey),
+                    const ProfileHomeScreen(),
                   ],
                 ),
               ),

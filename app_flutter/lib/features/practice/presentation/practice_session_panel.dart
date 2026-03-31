@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 import '../../../core/theme/echo_theme.dart';
+import '../../../core/tts/piper_tts_service.dart';
 import '../../../data/dto/practice_chat_dto.dart';
 import '../../../data/repositories/practice_chat_repository.dart';
 import '../domain/practice_chat_models.dart';
@@ -103,6 +104,7 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
     if (_playingVoiceId == msg.id) {
       await _player.stop();
       await _tts.stop();
+      await PiperTtsService.instance.stop();
       await _playerSub?.cancel();
       _playerSub = null;
       if (mounted) setState(() => _playingVoiceId = null);
@@ -111,6 +113,7 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
 
     await _player.stop();
     await _tts.stop();
+    await PiperTtsService.instance.stop();
     await _playerSub?.cancel();
     _playerSub = null;
     if (!mounted) return;
@@ -121,7 +124,11 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
         msg.audioPath!.isEmpty;
 
     if (useTts) {
-      await _tts.speak(msg.transcript);
+      try {
+        await PiperTtsService.instance.speak(msg.transcript);
+      } catch (_) {
+        await _tts.speak(msg.transcript);
+      }
     } else {
       try {
         await _player.setFilePath(msg.audioPath!);
