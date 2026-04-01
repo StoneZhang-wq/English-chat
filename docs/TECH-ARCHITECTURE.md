@@ -248,15 +248,15 @@ backend/
 
 ## 7.1 商业化与许可（待确认）
 
-**现状**：为实现端侧 Piper TTS（离线英文两音色 + 可下载更多音色），Flutter 端已引入第三方依赖 `runanywhere` / `runanywhere_onnx`（ONNX Runtime 后端）。
+**现状**：端侧离线英文 TTS 使用 **`flutter_kitten_tts`**（KittenML ONNX，包声明 **MIT**）。首次初始化会从 HuggingFace 拉取模型与语音数据（约数十 MB），缓存在应用支持目录，符合「不重复下载」策略（见 §4.5.1）。
 
-**风险点**：这两项依赖在其发布页声明使用 **RunAnywhere License**（基于 Apache 2.0 但包含额外条款），与常见 MIT/Apache2/BSD 的“直接商用”许可不同。若未来确定 **商业化/上架/付费**，需在发布前完成以下动作：
+**仍需核对**：
 
-- **确认许可**：阅读并确认其 License 条款是否满足商业化分发与闭源/开源策略。
-- **必要时更换方案**：若不满足，改为完全开源可商用的 Piper + ONNX Runtime 方案（自集成或选择合适许可的推理库）。
-- **模型许可**：Piper voice（不同 voice）可能有不同 license，需一并核对。
+- **模型与数据许可**：KittenML / 随包下载的 ONNX、voices、espeak-ng 数据等，是否在目标分发场景（地区、商用、闭源）下可用；以官方仓库与 HuggingFace 卡片为准。
+- **系统 TTS 回退**：`flutter_tts` 仍可作为失败时的回退；各平台离线语音包许可由系统/厂商侧管理。
+- **Android / `libespeak-ng.so`**：Kitten 依赖插件自带的 **espeak-ng** 动态库。若 Logcat 出现 **`dlopen failed: library "libespeak-ng.so" not found`**：工程已在 **`MainActivity`** 里 **`System.loadLibrary("espeak-ng")`** 预加载（便于 FFI 解析）；若仍失败，请确认设备 ABI 为 **arm64-v8a / armeabi-v7a / x86_64**（避免仅 **x86** 32 位模拟器），并 **`flutter clean` 后全量重编**。插件原生构建需要本机安装 **Android SDK CMake**（3.18+），否则 Gradle 会在 `:flutter_kitten_tts:configureCMake*` 阶段失败。
 
-> 本节为“记录待办”，不阻塞当前开发调试；但上线前必须完成合规确认。
+> 上线前建议再扫一遍依赖与模型条款；本节不阻塞日常开发调试。
 
 ---
 

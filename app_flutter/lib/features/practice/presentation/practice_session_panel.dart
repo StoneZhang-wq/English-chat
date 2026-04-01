@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' show log;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,7 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 import '../../../core/theme/echo_theme.dart';
-import '../../../core/tts/piper_tts_service.dart';
+import '../../../core/tts/kitten_tts_service.dart' show KittenTtsService, kittenTtsLogName;
 import '../../../data/dto/practice_chat_dto.dart';
 import '../../../data/repositories/practice_chat_repository.dart';
 import '../domain/practice_chat_models.dart';
@@ -104,7 +105,7 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
     if (_playingVoiceId == msg.id) {
       await _player.stop();
       await _tts.stop();
-      await PiperTtsService.instance.stop();
+      await KittenTtsService.instance.stop();
       await _playerSub?.cancel();
       _playerSub = null;
       if (mounted) setState(() => _playingVoiceId = null);
@@ -113,7 +114,7 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
 
     await _player.stop();
     await _tts.stop();
-    await PiperTtsService.instance.stop();
+    await KittenTtsService.instance.stop();
     await _playerSub?.cancel();
     _playerSub = null;
     if (!mounted) return;
@@ -125,8 +126,24 @@ class _PracticeSessionPanelState extends State<PracticeSessionPanel> {
 
     if (useTts) {
       try {
-        await PiperTtsService.instance.speak(msg.transcript);
-      } catch (_) {
+        await KittenTtsService.instance.speak(
+          msg.transcript,
+          onPlaybackComplete: () {
+            if (mounted && _playingVoiceId == msg.id) {
+              setState(() => _playingVoiceId = null);
+            }
+          },
+        );
+      } catch (e, st) {
+        debugPrint(
+          '[$kittenTtsLogName] panel: Kitten failed → FlutterTts. $e\n$st',
+        );
+        log(
+          'KittenTTS failed, using FlutterTts fallback',
+          name: kittenTtsLogName,
+          error: e,
+          stackTrace: st,
+        );
         await _tts.speak(msg.transcript);
       }
     } else {
