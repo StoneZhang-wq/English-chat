@@ -6,6 +6,7 @@ import '../../../app/widgets/echo_top_bar.dart';
 import '../../ai_dialogue/presentation/ai_dialogue_home_screen.dart';
 import '../../p2p/presentation/p2p_home_screen.dart';
 import '../../shadowing/presentation/shadowing_tab_navigator.dart';
+import '../../voice_lab/presentation/voice_lab_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -57,7 +58,15 @@ class _HomeScreenState extends State<HomeScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              const EchoTopBar(),
+              EchoTopBar(
+                onOpenVoiceLab: () {
+                  Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const VoiceLabScreen(),
+                    ),
+                  );
+                },
+              ),
               Expanded(
                 child: IndexedStack(
                   index: _stackIndex,

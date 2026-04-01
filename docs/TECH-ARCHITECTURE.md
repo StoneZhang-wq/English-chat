@@ -62,7 +62,7 @@ flowchart LR
   State -.->|SDK Token 规划| TRTC
 ```
 
-**【现状】**：主客户端 **`app_flutter/`**；Practice 文本对话已调 **`POST /api/practice/chat`**；语音转写仍为占位，LLM 密钥仅在 **`backend`**。  
+**【现状】**：主客户端 **`app_flutter/`**；Practice 文本对话已调 **`POST /api/practice/chat`**；**Voice Lab** 已接 **Vosk 离线识别**（`vosk_flutter_service`，**Android / iOS** 麦克风流；iOS 需先执行插件 `install`）+ **flutter_tts**；练习主流程内语音转写仍可逐步替换占位，LLM 密钥仅在 **`backend`**。  
 **【规划】**：端侧 Vosk 转写；数据库与鉴权按产品迭代接入；P2P 为 **Agora / TRTC** 二选一。
 
 ---
@@ -76,14 +76,14 @@ flowchart LR
 | UI | Material 3；Echo 主题见 `core/theme/echo_theme.dart` |
 | 状态 | **Riverpod** 已在 `pubspec.yaml`（可按 screen 逐步采用） |
 | 网络 | **Dio**；客户端 `lib/data/http/dio_client.dart`；Base URL **`core/config/env.dart`** |
-| 语音相关 | **`record`** 录音；**`just_audio`** / **`flutter_tts`** 播放；**Vosk** 待接入 |
+| 语音相关 | **`record`** 录音；**`just_audio`** / **`flutter_tts`** 播放；**Vosk**（`vosk_flutter_service`，Android/iOS 麦克风流；模型见 `assets/models/`）；**`permission_handler`**；Voice Lab 见 `features/voice_lab/` |
 | 字体 | **`google_fonts`**（如 Shadowing 选题页） |
 
 ### 4.2 目录结构（约定 + 现状）
 
 **依赖方向**：**features → data → core**；禁止 **data → features**。
 
-**目标形态（不必空建目录）**：顶层固定为 `app/`、`core/`、`data/`、`features/`；`core` 常见 `config/`、`theme/`、`utils/`；`data` 常见 `http/`、`dto/`、`repositories/`。`features/<name>/` 已按 **`presentation/`**（页面与 Widget）、**`domain/`**（路由常量、与 UI 耦合的模型等）拆分；**`application/`**（Controller/Notifier）待按需引入。DTO 与 UI 长期分叉时加 `data/mappers/`；多 feature 共用录音/播放时再抽 `core/audio/` 等。
+**目标形态（不必空建目录）**：顶层固定为 `app/`、`core/`、`data/`、`features/`；`core` 常见 `config/`、`theme/`、`utils/`；**`core/audio/`**（Vosk 封装、TTS 单例）；`data` 常见 `http/`、`dto/`、`repositories/`。`features/<name>/` 已按 **`presentation/`**（页面与 Widget）、**`domain/`**（路由常量、与 UI 耦合的模型等）拆分；**`application/`**（Controller/Notifier）待按需引入。DTO 与 UI 长期分叉时加 `data/mappers/`。
 
 **当前仓库简图**（随 PR 更新）：
 
@@ -91,7 +91,7 @@ flowchart LR
 app_flutter/lib/
 ├── main.dart
 ├── app/           # app.dart、widgets（Echo 顶/底栏）
-├── core/          # config/env、theme
+├── core/          # config/env、theme、audio（Vosk/TTS）
 ├── data/          # http、dto、repositories
 └── features/
     ├── home/presentation/
@@ -99,6 +99,7 @@ app_flutter/lib/
     ├── session/presentation/
     ├── practice/domain/、presentation/
     ├── ai_dialogue/presentation/
+    ├── voice_lab/presentation/
     └── p2p/presentation/
 ```
 
@@ -116,7 +117,7 @@ app_flutter/lib/
 
 ### 4.4 导航与产品入口（现状）
 
-- **外壳**：`HomeScreen` — `EchoTopBar` + **三 Tab 内容区** + `EchoBottomBar`；底栏路由名：`shadowing`、`ai_dialogue`、`p2p`。
+- **外壳**：`HomeScreen` — `EchoTopBar`（含 **Voice Lab** 入口图标）+ **三 Tab 内容区** + `EchoBottomBar`；底栏路由名：`shadowing`、`ai_dialogue`、`p2p`。
 - **Shadowing**：`ShadowingTabNavigator` 内嵌 **`Navigator`** — 场景列表 → **`ScenarioSessionScreen`** 时**底栏仍显示**（全屏 push 会破坏该行为）。
 - **场景内**：`ScenarioSessionScreen` — 子 Tab **Shadowing**（跟读面板） / **Practice**（**`PracticeSessionPanel`**）。
 - **Practice 与 LLM**：`PracticeChatRepository` → **`POST /api/practice/chat`**；请求体为 `messages`（user/assistant 文本或语音转写）+ 可选 `scenario_title`。

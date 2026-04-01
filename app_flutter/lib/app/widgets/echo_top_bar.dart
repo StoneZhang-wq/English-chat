@@ -7,12 +7,15 @@ class EchoTopBar extends StatelessWidget {
   final String userDisplayName;
   final String userInitial;
   final VoidCallback onSignOut;
+  /// 打开 Voice Lab（离线 STT / TTS 实验页）；为 null 时不显示入口。
+  final VoidCallback? onOpenVoiceLab;
 
   const EchoTopBar({
     super.key,
     this.userDisplayName = 'GUEST',
     this.userInitial = 'G',
     this.onSignOut = _noop,
+    this.onOpenVoiceLab,
   });
 
   static void _noop() {}
@@ -25,9 +28,25 @@ class EchoTopBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'MyEnglishChat',
-            style: echoTypographyLogo,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'MyEnglishChat',
+                style: echoTypographyLogo,
+              ),
+              if (onOpenVoiceLab != null) ...[
+                const SizedBox(width: 4),
+                IconButton(
+                  tooltip: 'Voice Lab',
+                  onPressed: onOpenVoiceLab,
+                  icon: const Icon(Icons.graphic_eq_outlined, size: 22),
+                  color: echoMuted,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                ),
+              ],
+            ],
           ),
           Row(
             mainAxisSize: MainAxisSize.min,

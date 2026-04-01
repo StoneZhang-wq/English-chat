@@ -5,7 +5,7 @@ publish_to: "none"
 version: 0.1.0+1
 
 environment:
-  sdk: ">=3.4.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -29,6 +29,11 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.1.5
 
+  # 离线 ASR（Vosk）；使用 vendored 副本以去掉损坏的 Web 插件注册，便于 `flutter run -d chrome` 编译。
+  vosk_flutter_service:
+    path: third_party/vosk_flutter_service
+  permission_handler: ^12.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -36,4 +41,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/models/
 
