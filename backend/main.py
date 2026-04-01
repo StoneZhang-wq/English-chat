@@ -4,16 +4,25 @@ from __future__ import annotations
 import logging
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from config import SERVER_HOST, SERVER_PORT
-from routers import practice_chat
+from api.router import build_api_router
+from core.settings import get_settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="MyEnglishChat API", version="0.1.0")
 
-app.include_router(practice_chat.router, prefix="/api")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(build_api_router())
 
 
 @app.get("/health")
@@ -24,9 +33,10 @@ def health() -> dict[str, str]:
 if __name__ == "__main__":
     import uvicorn
 
+    settings = get_settings()
     uvicorn.run(
         "main:app",
-        host=SERVER_HOST,
-        port=SERVER_PORT,
+        host=settings.server_host,
+        port=settings.server_port,
         reload=True,
     )
