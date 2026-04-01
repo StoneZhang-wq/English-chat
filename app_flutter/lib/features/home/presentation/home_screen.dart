@@ -3,16 +3,10 @@ import 'package:flutter/services.dart';
 
 import '../../../app/widgets/echo_bottom_bar.dart';
 import '../../../app/widgets/echo_top_bar.dart';
-<<<<<<< HEAD
-import '../../ai_dialogue/presentation/ai_dialogue_home_screen.dart';
-import '../../p2p/presentation/p2p_home_screen.dart';
-import '../../shadowing/presentation/shadowing_tab_navigator.dart';
-import '../../voice_lab/presentation/voice_lab_screen.dart';
-=======
 import '../../learn/presentation/learn_navigator.dart';
 import '../../p2p_match/presentation/p2p_navigator.dart';
 import '../../profile/presentation/profile_home_screen.dart';
->>>>>>> 4d400a41e830e6bcaa14474610b8cda2cc43c884
+import '../../voice_lab/presentation/voice_lab_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

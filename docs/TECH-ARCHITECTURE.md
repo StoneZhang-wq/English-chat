@@ -256,7 +256,8 @@ backend/
 
 - **模型与数据许可**：KittenML / 随包下载的 ONNX、voices、espeak-ng 数据等，是否在目标分发场景（地区、商用、闭源）下可用；以官方仓库与 HuggingFace 卡片为准。
 - **系统 TTS 回退**：`flutter_tts` 仍可作为失败时的回退；各平台离线语音包许可由系统/厂商侧管理。
-- **Android / `libespeak-ng.so`**：Kitten 依赖插件自带的 **espeak-ng** 动态库。若 Logcat 出现 **`dlopen failed: library "libespeak-ng.so" not found`**：工程已在 **`MainActivity`** 里 **`System.loadLibrary("espeak-ng")`** 预加载（便于 FFI 解析）；若仍失败，请确认设备 ABI 为 **arm64-v8a / armeabi-v7a / x86_64**（避免仅 **x86** 32 位模拟器），并 **`flutter clean` 后全量重编**。插件原生构建需要本机安装 **Android SDK CMake**（3.18+），否则 Gradle 会在 `:flutter_kitten_tts:configureCMake*` 阶段失败。
+- **Android / `libespeak-ng.so`**：Kitten 依赖插件自带的 **espeak-ng** 动态库。若 Logcat 出现 **`dlopen failed: library "libespeak-ng.so" not found`**：工程已在 **`MainActivity`** 里 **`System.loadLibrary("espeak-ng")`** 预加载（便于 FFI 解析）；若仍失败，请确认设备 ABI 为 **arm64-v8a / armeabi-v7a / x86_64**（避免仅 **x86** 32 位模拟器），并 **`flutter clean` 后全量重编**。
+- **Android / CMake `[CXX1300] CMake '3.18.1' was not found`**：`flutter_kitten_tts` 的 Gradle 里写死了 **CMake 3.18.1** 目录名；**`app_flutter/android/settings.gradle.kts`** 会在构建前尽量把 **`local.properties` 的 `cmake.dir`** 指到你 SDK 里已有的 **3.22 / 4.x**。**若仍报 CXX1300**（常见于 Windows）：在 **`%ANDROID_SDK_ROOT%\cmake`** 下用目录联接把 **3.18.1** 指到已安装版本，例如在 **cmd** 执行（路径按本机调整）`mklink /J "%ANDROID_SDK_ROOT%\cmake\3.18.1" "%ANDROID_SDK_ROOT%\cmake\3.22.1"`；或在 SDK Manager 的 **SDK Tools → CMake** 里安装 **3.18.1**。
 
 > 上线前建议再扫一遍依赖与模型条款；本节不阻塞日常开发调试。
 
