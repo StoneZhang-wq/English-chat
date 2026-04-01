@@ -36,16 +36,20 @@ flutter run
 
 ### 3.1 真机 / 模拟器的后端地址
 
-默认 debug 会用 `http://10.0.2.2:8088/`（Android 模拟器访问本机）。你可以在启动时覆盖：
+默认 debug 会用 `http://10.0.2.2:8088/`（**仅** Android 模拟器访问本机）。**物理手机**必须改为电脑的局域网 IP，例如：
 
 ```powershell
 flutter run --dart-define=BACKEND_BASE_URL=http://192.168.0.59:8088/
 ```
 
-> iOS 模拟器通常用 `http://127.0.0.1:8088/`；真机用电脑局域网 IP。
+**Android Studio**：**Run → Edit Configurations** → 选中你的 Flutter 配置 → **Additional run arguments** 填同上 `--dart-define=...`（改 IP 后需 **Stop 再 Run**，编译期常量才会更新）。
+
+**明文 HTTP**：`debug` / `profile` 构建已在 **`android/app/src/debug|profile/AndroidManifest.xml`** 合并 **`usesCleartextTraffic`**，真机访问 `http://192.168.x.x:8088` 不会被默认策略拦掉。
+
+> iOS 模拟器通常用 `http://127.0.0.1:8088/`；iOS 真机同样要用局域网 IP，并在需要时配置 **App Transport Security**（INFO.plist）。
 
 ## 4) 与后端联调
 
-- 后端：`backend/`（FastAPI）
-- Debug 真机联调要注意局域网 IP 与端口，以及 Android/iOS 的网络安全策略（后续会在 Flutter 侧补齐环境配置与说明）。
+- 后端：`backend/`（FastAPI），默认监听 `0.0.0.0:8088`，手机与电脑须在同一 Wi‑Fi；Windows 防火墙需放行 **8088** 入站。
+- 可在手机浏览器打开 `http://<电脑IP>:8088/docs` 确认网络可达。
 

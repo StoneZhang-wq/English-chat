@@ -171,8 +171,9 @@ app_flutter/lib/
   - 若采用 **系统 TTS（Android/iOS）**：离线语音包由系统安装（测试/用户只需一次性下载）；App 不重复下载
   - 若采用 **自带离线 TTS 引擎/模型**：同 Vosk，首次下载并缓存 + 版本更新
 
-**Base URL**：默认 Android 模拟器 **`http://10.0.2.2:8088/`**；真机用  
-`flutter run --dart-define=BACKEND_BASE_URL=http://<电脑局域网IP>:8088/`。
+**Base URL**：默认 Android 模拟器 **`http://10.0.2.2:8088/`**；真机必须用电脑局域网 IP，例如  
+`flutter run --dart-define=BACKEND_BASE_URL=http://192.168.x.x:8088/`（Android Studio：**Run → Edit Configurations → Additional run arguments** 里同样填写）。  
+**明文 HTTP**：debug/profile 已在 **`android/app/src/debug|profile/AndroidManifest.xml`** 设 **`usesCleartextTraffic`**，避免真机访问 `http://` 后端被系统拦截；**release** 若仍用 HTTP 需在 `main` 清单单独配置或改用 HTTPS。
 
 ### 4.6 后续迭代（摘录）
 
