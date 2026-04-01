@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  flutter_onnxruntime
   flutter_tts
   permission_handler_windows
   record_windows

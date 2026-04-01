@@ -18,6 +18,9 @@ dependencies:
   # Networking
   dio: ^5.7.0
 
+  # On-device TTS (KittenTTS / KittenML ONNX, MIT)
+  flutter_kitten_tts: ^0.0.4
+
   # Audio record / playback (placeholders for next iteration)
   # 6.x 与当前 record_platform_interface 对齐；5.x 的 record_linux 会编译失败
   record: ^6.2.0

@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  flutter_onnxruntime
   record_linux
   vosk_flutter_service
 )
